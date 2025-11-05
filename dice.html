@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Dice</title>
+    </head>
+    <body>
+        <h1>Dice game</h1>
+        <div id="balance">balance:100</div>
+        <div id="dice-result">Try to play</div>
+
+        <div id="bet-selection">
+            <p>guess number:</p>
+            <input type="radio" id="bet1" name="dice-bet" value="1" > <label for="bet1">1</label>
+            <input type="radio" id="bet2" name="dice-bet" value="2"> <label for="bet2">2</label>
+            <input type="radio" id="bet3" name="dice-bet" value="3"checked> <label for="bet3">3</label>
+            <input type="radio" id="bet4" name="dice-bet" value="4"> <label for="bet4">4</label>
+            <input type="radio" id="bet5" name="dice-bet" value="5"> <label for="bet5">5</label>
+            <input type="radio" id="bet6" name="dice-bet" value="6"> <label for="bet6">6</label>
+        </div>
+
+        <button id="dice-gamble">Roll!</button>
+        <p id="dice-text">Press to start</p>
+
+        <hr><a href="index.html">Home page</a>
+        <div id="dodep" style="display: none;">
+            <button id="dodepNaBalik">dodep</button>
+        </div>
+
+        <script src="js/dice.js"></script>
+    </body>
+</html>
