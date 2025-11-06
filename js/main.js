@@ -16,5 +16,12 @@ function saveBalance(newAmount) {
 
 function updateBalanceDisplay() {
     const balanceElement = document.getElementById("balance");
+    const maxBet = document.getElementById("user-bet");
     balanceElement.textContent = `Balance: ${userBalance}`;
+    if (maxBet === null) {
+        console.log("not bet on page");
+    }
+    else{
+    maxBet.max = userBalance;
+    }
 }

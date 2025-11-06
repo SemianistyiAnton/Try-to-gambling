@@ -5,8 +5,9 @@ const diseText = document.getElementById("dice-text");
 const userNumnerChoice = document.getElementById("bet-selection");
 const dodepButton = document.getElementById("dodepNaBalik");
 const dodepCase = document.getElementById("dodep");
+const userBet = document.getElementById("user-bet");
 
-const diceBet = 15;
+let diceBet;
 
 playDiceButton.addEventListener("click", diceRoll);
 dodepButton.addEventListener("click", dodepNaBalance)
@@ -17,6 +18,7 @@ updateBalanceDisplay();
 
 function diceRoll() {
     playDiceButton.disabled = true;
+    diceBet = parseInt(userBet.value);
 
     const selectedBet = document.querySelector('input[name="dice-bet"]:checked');
     const selectedBetNumber = parseInt(selectedBet.value);
