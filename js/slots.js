@@ -6,19 +6,22 @@ const wheel2 = document.getElementById("wheel2");
 const wheel3 = document.getElementById("wheel3");
 
 const symbols = ['UwU','-_-','^-^','7'];
-let userBalance = 100;
 const spinValve = 15;
 
 playButton.addEventListener("click", rungame);
+
+loadBalance();
+updateBalanceDisplay();
 
 function rungame() {
     playButton.disabled = true;
     if (userBalance < spinValve) {
         resultText.textContent = "credit beri";
+        playButton.disabled = false;
     }
     else{
-    userBalance -= spinValve;
-    balance.textContent = `Balance: ${userBalance}`;
+    saveBalance(userBalance - spinValve); 
+    updateBalanceDisplay();
     resultText.textContent = "in progress";
 
     wheel1.textContent = "spin))";
@@ -51,16 +54,16 @@ function winCheker(){
 
     if(r1 == r2 && r2 == r3){
         resultText.textContent = "JACPOT";
-        userBalance += spinValve*7;
-        balance.textContent = `Balance: ${userBalance}`;
+        saveBalance(userBalance + spinValve*7); 
+        updateBalanceDisplay();
     }
     else if (r1 == r2 || r2 == r3 ||r1==r3) {
         resultText.textContent = "DoDep";
-        userBalance += spinValve*2;
-        balance.textContent = `Balance: ${userBalance}`;
+        saveBalance(userBalance + spinValve*2); 
+        updateBalanceDisplay();
     }
     else{
         resultText.textContent = "U lose. Mb 1 more try?!)";
-        balance.textContent = `Balance: ${userBalance}`;
+        updateBalanceDisplay();
     }
 }

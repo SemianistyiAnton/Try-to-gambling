@@ -6,35 +6,39 @@ const userNumnerChoice = document.getElementById("bet-selection");
 const dodepButton = document.getElementById("dodepNaBalik");
 const dodepCase = document.getElementById("dodep");
 
-let userBalance = 100;
 const diceBet = 15;
 
 playDiceButton.addEventListener("click", diceRoll);
+dodepButton.addEventListener("click", dodepNaBalance)
+
+loadBalance();
+updateBalanceDisplay();
+
 
 function diceRoll() {
     playDiceButton.disabled = true;
 
     const selectedBet = document.querySelector('input[name="dice-bet"]:checked');
-    const selectedBetString = selectedBet.value;
+    const selectedBetNumber = parseInt(selectedBet.value);
 
     if (userBalance < diceBet) {
         diseText.textContent = "deneg.net";
         playDiceButton.disabled = false; 
         dodepCase.style.display = "block";
-        dodepButton.addEventListener("click", dodepNaBalance)
     } else {
-        userBalance -= diceBet;
-        balance.textContent = `Balance: ${userBalance}`;
+        saveBalance(userBalance - diceBet); 
+        updateBalanceDisplay();
+
         diseText.textContent = "in progress";
         diceRusultText.textContent = "..."; 
 
         setTimeout(() => {
             let rollResult = Math.floor(Math.random()*6) + 1;
             diceRusultText.textContent = `${rollResult}`;
-            if (rollResult == selectedBetString) {
+            if (rollResult === selectedBetNumber) {
                 diseText.textContent = "soo... U win"; 
-                userBalance += 5*diceBet;
-                balance.textContent = `Balance: ${userBalance}`;
+                saveBalance(userBalance + (5 * diceBet));
+                updateBalanceDisplay();
             } else {
                 diseText.textContent = "Lol U lose";
             }
@@ -44,7 +48,7 @@ function diceRoll() {
 }
 
 function dodepNaBalance() {
-    userBalance += 100;
-    balance.textContent = `Balance: ${userBalance}`;
+    saveBalance(userBalance + 100); 
+    updateBalanceDisplay();
     dodepCase.style.display = "none";
 }
