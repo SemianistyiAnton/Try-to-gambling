@@ -1,101 +1,97 @@
 const playButton = document.getElementById("gamble");
 const resultText = document.getElementById("gamle-result");
-const balance = document.getElementById("balance");
 const wheel1 = document.getElementById("wheel1");
 const wheel2 = document.getElementById("wheel2");
 const wheel3 = document.getElementById("wheel3");
-const spinBet = document.getElementById("user-bet");
+const spinBetInput = document.getElementById("user-bet");
 
-const symbols = ['UwU','-_-','^-^','7'];
+const symbols = ['<3', '-_-', '{}', '7']; 
 
 let spinValve;
-let stop = 0;
+let stopStep = 0;
 let spinInterval;
-let finalWheelValues =[];
-
-playButton.addEventListener("click", rungame);
 
 loadBalance();
 updateBalanceDisplay();
 
-function rungame() {
-    spinValve = parseInt(spinBet.value);
-    if (spinValve<=0||isNaN(spinValve)) {
-        resultText.textContent = "No no no";
-    }
-    else{
-    playButton.disabled = true;
-    if (userBalance < spinValve) {
-        resultText.textContent = "credit beri";
-        playButton.disabled = false;
-    }
-    else{
-    saveBalance(userBalance - spinValve); 
-    updateBalanceDisplay();
-    resultText.textContent = "in progress";
+playButton.addEventListener("click", rungame);
 
-    stop = 0;
-    spinInterval = setInterval(whellAnimation, 100);
-    finalWheelValues = [];
+function randomSymbol() {
+    return symbols[Math.floor(Math.random() * symbols.length)];
+}
+
+function rungame() {
+    spinValve = parseInt(spinBetInput.value);
+
+    if (isNaN(spinValve) || spinValve <= 0) {
+        resultText.textContent = "Ставка не прошла!";
+        return;
+    }
+
+    if (userBalance < spinValve) {
+        resultText.textContent = "Маловато золота";
+        return;
+    }
+
+    playButton.disabled = true;
+    saveBalance(userBalance - spinValve);
+    updateBalanceDisplay();
+    resultText.textContent = "Фарту!";
+
+    stopStep = 0;
+    spinInterval = setInterval(wheelAnimation, 100);
+
     setTimeout(() => {
-        stop = 1;
-        finalWheelValues[0] = randomSymbol();
-        wheel1.textContent = finalWheelValues[0];
+        stopStep = 1;
+        const val1 = randomSymbol();
+        wheel1.textContent = val1;
+
+
         setTimeout(() => {
-            stop = 2;
-            finalWheelValues[1] = randomSymbol();
-            wheel2.textContent = finalWheelValues[1];
+            stopStep = 2;
+            const val2 = randomSymbol();
+            wheel2.textContent = val2;
+
             setTimeout(() => {
-                stop = 3;
-                finalWheelValues[2] = randomSymbol();
-                wheel3.textContent = finalWheelValues[2];
-                winCheker(finalWheelValues);
-                clearInterval(spinInterval)
+                stopStep = 3;
+                const val3 = randomSymbol();
+                wheel3.textContent = val3;
+
+                clearInterval(spinInterval);
+                checkWin(val1, val2, val3);
                 playButton.disabled = false;
+
             }, 1000);
         }, 1000);
     }, 1000);
-    }
-}
 }
 
-function randomSymbol() {
-    let randomSymbol = Math.floor(Math.random()*symbols.length);
-    return symbols[randomSymbol];
-}
-
-function winCheker(wheelResult){
-    const r1 = wheelResult[0];
-    const r2 = wheelResult[1];
-    const r3 = wheelResult[2];
-
-    if(r1 == r2 && r2 == r3){
-        resultText.textContent = "JACPOT";
-        saveBalance(userBalance + spinValve*7); 
-        updateBalanceDisplay();
-    }
-    else if (r1 == r2 || r2 == r3 ||r1==r3) {
-        resultText.textContent = "DoDep";
-        saveBalance(userBalance + spinValve*2); 
-        updateBalanceDisplay();
-    }
-    else{
-        resultText.textContent = "U lose. Mb 1 more try?!)";
-        updateBalanceDisplay();
-    }
-}
-
-function whellAnimation() {
-    if (stop === 0) { 
+function wheelAnimation() {
+    if (stopStep === 0) {
         wheel1.textContent = randomSymbol();
         wheel2.textContent = randomSymbol();
         wheel3.textContent = randomSymbol();
-    } 
-    else if (stop === 1) {
+    }
+    else if (stopStep === 1) {
         wheel2.textContent = randomSymbol();
         wheel3.textContent = randomSymbol();
-    } 
-    else if (stop === 2) {
+    }
+    else if (stopStep === 2) {
         wheel3.textContent = randomSymbol();
     }
+}
+
+function checkWin(r1, r2, r3) {
+    if (r1 === r2 && r2 === r3) {
+        resultText.textContent = "JACKPOT!!! x7";
+        saveBalance(userBalance + (spinValve * 7));
+    } 
+    else if (r1 === r2 || r2 === r3 || r1 === r3) {
+        resultText.textContent = "Пара совпала! x2";
+        saveBalance(userBalance + (spinValve * 2));
+    } 
+    else {
+        resultText.textContent = "Проигрыш. Попробуй еще!";
+    }
+    updateBalanceDisplay();
 }

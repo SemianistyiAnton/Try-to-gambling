@@ -2,8 +2,9 @@ let userBalance;
 
 function loadBalance() {
     const savedBalance = localStorage.getItem('casinoBalance');
-    if (savedBalance === null) {
-        userBalance = 100; 
+    if (savedBalance === null || isNaN(parseInt(savedBalance))) {
+        userBalance = 100;
+        saveBalance(100);
     } else {
         userBalance = parseInt(savedBalance);
     }
@@ -16,12 +17,13 @@ function saveBalance(newAmount) {
 
 function updateBalanceDisplay() {
     const balanceElement = document.getElementById("balance");
-    const maxBet = document.getElementById("user-bet");
-    balanceElement.textContent = `Balance: ${userBalance}`;
-    if (maxBet === null) {
-        console.log("not bet on page");
+    if (balanceElement) {
+        balanceElement.textContent = `Balance: ${userBalance}`;
     }
-    else{
-    maxBet.max = userBalance;
+
+    const betInput = document.getElementById("user-bet");
+    if (betInput) {
+        betInput.max = userBalance;
+        betInput.placeholder = `Max: ${userBalance}`;
     }
 }
