@@ -23,13 +23,25 @@
     <p id="gamle-result">press for start</p>
 
     <hr><a href="index.html">Home page</a>
+
     <script src="js/main.js"></script>
-    <script src="js/slots.js"></script>
-    <script type="module">
-        import { calorGenerator, timeoutConsumer } from '. ./node_modules/casino-lib/index.js';
-        window.calorGenerator = calorGenerator;
-        window.timeoutConsumer = timeoutConsumer;   
+    <script type="importmap">
+        {
+            "imports": {
+                "casino-lib": "../casino-lib/index.js"
+            }
+        }
     </script>
+
+    <script type="module">
+        import { colorGenerator, timeoutConsumer } from 'casino-lib';
+
+        window.colorGenerator = colorGenerator;
+        window.timeoutConsumer = timeoutConsumer;
+
+    </script>
+
+    <script src="js/slots.js"></script>
 </body>
 
 </html>

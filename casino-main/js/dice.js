@@ -15,12 +15,12 @@ function diceRoll() {
     const diceBet = parseInt(userBetInput.value);
 
     if (isNaN(diceBet) || diceBet <= 0) {
-        diceText.textContent = "Депни как человек, чё это!";
+        diceText.textContent = "Enter a valid bet amount!";
         return; 
     }
 
     if (userBalance < diceBet) {
-        diceText.textContent = "Маловато на балике!";
+        diceText.textContent = "Not enough balance!";
         dodepCase.style.display = "block";
         return;
     }
@@ -29,7 +29,7 @@ function diceRoll() {
     saveBalance(userBalance - diceBet);
     updateBalanceDisplay();
 
-    diceText.textContent = "Крутка";
+    diceText.textContent = "Rolling...";
     diceResultText.textContent = "...";
 
     const selectedRadio = document.querySelector('input[name="dice-bet"]:checked');
@@ -40,11 +40,11 @@ function diceRoll() {
         diceResultText.textContent = `${rollResult}`;
 
         if (rollResult === selectedNumber) {
-            diceText.textContent = `Выпало ${rollResult}. Победа!`;
+            diceText.textContent = `Rolled ${rollResult}. You win!`;
             saveBalance(userBalance + (diceBet * 6));
             updateBalanceDisplay();
         } else {
-            diceText.textContent = `Выпало ${rollResult}. Ещё разок?`;
+            diceText.textContent = `Rolled ${rollResult}. Try again?`;
         }
 
         playDiceButton.disabled = false;
@@ -55,5 +55,5 @@ function dodepNaBalance() {
     saveBalance(userBalance + 100);
     updateBalanceDisplay();
     dodepCase.style.display = "none";
-    diceText.textContent = "Ломбард озолотился! Делайте ставки.";
+    diceText.textContent = "Balance topped up! Place your bets.";
 }

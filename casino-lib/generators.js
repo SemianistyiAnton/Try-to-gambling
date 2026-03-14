@@ -1,5 +1,5 @@
-export function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+export function* randomInt(min, max) {
+    yield Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export function* lcgGenerator(seed) {
@@ -13,7 +13,7 @@ export function* lcgGenerator(seed) {
     }       
 }   
 
-export function* calorGenerator(colors) {
+export function* colorGenerator(colors) {
     let index = 0;
     while (true) {
         yield colors[index];

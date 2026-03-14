@@ -24,40 +24,45 @@ function rungame() {
     spinValve = parseInt(spinBetInput.value);
 
     if (isNaN(spinValve) || spinValve <= 0) {
-        resultText.textContent = "Ставка не прошла!";
+        resultText.textContent = "Invalid bet!";
         return;
     }
 
     if (userBalance < spinValve) {
-        resultText.textContent = "Маловато золота";
+        resultText.textContent = "Not enough balance";
         return;
     }
 
     playButton.disabled = true;
     saveBalance(userBalance - spinValve);
     updateBalanceDisplay();
-    resultText.textContent = "Фарту!";
+    resultText.textContent = "Good luck!";
 
     stopStep = 0;
     spinInterval = setInterval(wheelAnimation, 100);
 
     setTimeout(() => {
         stopStep = 1;
-        const val1 = randomSymbol();
+        let val1 = randomSymbol();
         wheel1.textContent = val1;
 
 
         setTimeout(() => {
             stopStep = 2;
-            const val2 = randomSymbol();
+            let val2 = randomSymbol();
             wheel2.textContent = val2;
 
             setTimeout(() => {
                 stopStep = 3;
-                const val3 = randomSymbol();
+                let val3 = randomSymbol();
                 wheel3.textContent = val3;
 
                 clearInterval(spinInterval);
+
+                /*val1 = '<3';
+                val2 = '<3';
+                val3 = '<3';*/
+
                 checkWin(val1, val2, val3);
                 playButton.disabled = false;
 
@@ -85,7 +90,7 @@ function checkWin(r1, r2, r3) {
     if (r1 === r2 && r2 === r3) {
         resultText.textContent = "JACKPOT!!! x7";
         saveBalance(userBalance + (spinValve * 7)); 
-        const colors = window.colorCycleGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
+        const colors = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
         window.timeoutConsumer(colors, 3, (colors) => {
             if (colors === "") {
                 resultText.style.color = "black";
@@ -95,11 +100,11 @@ function checkWin(r1, r2, r3) {
         });
     }
     else if (r1 === r2 || r2 === r3 || r1 === r3) {
-        resultText.textContent = "Пара совпала! x2";
+        resultText.textContent = "Matched pair! x2";
         saveBalance(userBalance + (spinValve * 2));
     } 
     else {
-        resultText.textContent = "Проигрыш. Попробуй еще!";
+        resultText.textContent = "You lost. Try again!";
     }
     updateBalanceDisplay();
 }
