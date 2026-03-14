@@ -1,0 +1,13 @@
+{
+  "name": "casino-lib",
+  "version": "1.0.0",
+  "description": "A library of random staff what I need.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Anton Sema",
+  "license": "MIT",
+  "type": "module"
+}

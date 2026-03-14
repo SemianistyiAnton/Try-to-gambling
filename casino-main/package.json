@@ -1,0 +1,16 @@
+{
+  "name": "casino-main",
+  "version": "1.0.0",
+  "description": "Casino Main Module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Anton Sema",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "casino-lib": "file:../casino-lib"
+  }
+}
