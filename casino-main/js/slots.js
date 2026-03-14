@@ -84,8 +84,16 @@ function wheelAnimation() {
 function checkWin(r1, r2, r3) {
     if (r1 === r2 && r2 === r3) {
         resultText.textContent = "JACKPOT!!! x7";
-        saveBalance(userBalance + (spinValve * 7));
-    } 
+        saveBalance(userBalance + (spinValve * 7)); 
+        const colors = window.colorCycleGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
+        window.timeoutConsumer(colors, 3, (colors) => {
+            if (colors === "") {
+                resultText.style.color = "black";
+            } else {
+                resultText.style.color = colors;
+            }
+        });
+    }
     else if (r1 === r2 || r2 === r3 || r1 === r3) {
         resultText.textContent = "Пара совпала! x2";
         saveBalance(userBalance + (spinValve * 2));

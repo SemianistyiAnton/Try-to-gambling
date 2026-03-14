@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="eu">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Holla, little gambler</title>
-        
-    </head>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holla, little gambler</title>
+
+</head>
+
 <body>
     <h1>wheel machina</h1>
     <div id="balance">balance: 100</div>
@@ -19,9 +21,15 @@
     <button id="gamble">spin</button> <input id="user-bet" type="number" min="0">
 
     <p id="gamle-result">press for start</p>
-    
+
     <hr><a href="index.html">Home page</a>
     <script src="js/main.js"></script>
     <script src="js/slots.js"></script>
+    <script type="module">
+        import { calorGenerator, timeoutConsumer } from '. ./node_modules/casino-lib/index.js';
+        window.calorGenerator = calorGenerator;
+        window.timeoutConsumer = timeoutConsumer;   
+    </script>
 </body>
+
 </html>
