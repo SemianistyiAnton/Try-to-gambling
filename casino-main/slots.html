@@ -34,8 +34,9 @@
     </script>
 
     <script type="module">
-        import { colorGenerator, timeoutConsumer } from 'casino-lib';
+        import { colorGenerator, timeoutConsumer, memo } from 'casino-lib';
 
+        window.memo = memo;
         window.colorGenerator = colorGenerator;
         window.timeoutConsumer = timeoutConsumer;
 

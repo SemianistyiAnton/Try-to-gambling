@@ -85,26 +85,46 @@ function wheelAnimation() {
         wheel3.textContent = randomSymbol();
     }
 }
+function multiplier(r1, r2, r3) {
+    if (r1 === r2 && r2 === r3) {
+        return 7;
+    }
+    if (r1 === r2 || r2 === r3 || r1 === r3) {
+        return 2;
+    }
+    return 0;
+}
+
+let preInitial;
 
 function checkWin(r1, r2, r3) {
-    if (r1 === r2 && r2 === r3) {
+
+    if (!preInitial) {
+        preInitial = window.memo(multiplier, 10);
+    }
+
+    const currentMultiplier = preInitial(r1, r2, r3);
+
+    if (currentMultiplier === 7) {
         resultText.textContent = "JACKPOT!!! x7";
         saveBalance(userBalance + (spinValve * 7)); 
-        const colors = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
-        window.timeoutConsumer(colors, 3, (colors) => {
-            if (colors === "") {
+        
+        const colorsGen = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
+        window.timeoutConsumer(colorsGen, 3, (color) => {
+            if (color === "") {
                 resultText.style.color = "black";
             } else {
-                resultText.style.color = colors;
+                resultText.style.color = color;
             }
         });
     }
-    else if (r1 === r2 || r2 === r3 || r1 === r3) {
+    else if (currentMultiplier === 2) {
         resultText.textContent = "Matched pair! x2";
         saveBalance(userBalance + (spinValve * 2));
     } 
     else {
         resultText.textContent = "You lost. Try again!";
     }
+    
     updateBalanceDisplay();
 }
