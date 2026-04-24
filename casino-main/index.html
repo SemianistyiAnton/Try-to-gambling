@@ -13,10 +13,31 @@
     <a href="dice.html">Dice</a>
 
 <script src="js/main.js"></script>
-<script>
-    loadBalance();
-    updateBalanceDisplay();
-</script>
+    <script>
+        loadBalance();
+        updateBalanceDisplay();
+    </script>
 
+    <hr>
+    <div id="leaderboard-section">
+        <h2>🏆 Зал Славы</h2>
+        
+        <button id="btn-load-top">Показать ТОП-5 выигрышей</button>
+        <button id="btn-cancel-top" disabled>Отменить загрузку</button>
+        
+        <p id="leaderboard-status"></p>
+        
+        <ol id="leaderboard-list"></ol>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "casino-lib": "../casino-lib/index.js"
+            }
+        }
+    </script>
+
+    <script type="module" src="js/lobby.js"></script>
 </body>
 </html>
