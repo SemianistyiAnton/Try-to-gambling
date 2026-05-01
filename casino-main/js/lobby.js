@@ -1,12 +1,5 @@
 import { Leaderboard } from 'casino-lib';
-
-const rawHistory = [
-    { game: "Slots", bet: 100, win: 0 },
-    { game: "Slots", bet: 50, win: 500 },
-    { game: "Dice", bet: 200, win: 0 },
-    { game: "Roulette", bet: 1000, win: 3500 },
-    { game: "Slots", bet: 10, win: 20 }
-];//Працюй мій маленький чат гпт. Перепрошую, що не зробив це з реальних результатів. Це лише демо варіант
+import { getGameHistory } from './db.js';
 
 let abortButton = null;
 
@@ -25,7 +18,16 @@ btnLoad.addEventListener('click', async () => {
     abortButton = new AbortController();
     
     try {
-        const topPlayers = await Leaderboard(rawHistory, abortButton.signal);
+        const fullHistory = await getGameHistory();
+
+        const formattedHistory = fullHistory.map(record => ({
+            game: record.game,
+            bet: record.result.bet, 
+            win: record.result.win,  
+            date: record.date
+        }));
+
+        const topPlayers = await Leaderboard(formattedHistory, abortButton.signal);
         
         statusText.textContent = "Loaded";
         topPlayers.forEach(player => {

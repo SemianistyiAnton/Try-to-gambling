@@ -1,36 +1,48 @@
-export function Leaderboard(gameHistory, cutSignal = null) {
-    return new Promise(async (resolve, reject) => {
-        const topWins = [];
+export async function Leaderboard(gameHistory, cutSignal = null) {
+    const topWins = [];
 
-        for (let i = 0; i < gameHistory.length; i++) {
-            const record = gameHistory[i];
+    const waitWithAbort = (ms, signal) => {
+        return new Promise((resolve, reject) => {
+            const id = setTimeout(() => {
+                if (signal) signal.removeEventListener('abort', onAbort);
+                resolve(true);
+            }, ms);
 
-            if (cutSignal && cutSignal.aborted) {
-                return reject(new Error("Stoped by user!"));
-            }//відміняйка
+            const onAbort = () => {
+                clearTimeout(id);
+                reject(new Error('Stopped by user'));
+            };
 
-            if (record.win <= 0) {
-                continue; 
-            }//чекер ПЕРЕМОГИ
-
-            try {
-                const fakeBack = await new Promise(res => setTimeout(() => res(true), 300));//на адекватний бекенд бюджету не було, тому імітую затримку(можливо в розвитку у мене)
-
-                if (fakeBack) {
-                    topWins.push({
-                        gameName: record.game.toUpperCase(),
-                        betAmount: record.bet,
-                        prize: record.win,
-                        date: new Date().toLocaleDateString()
-                    });
+            if (signal) {
+                if (signal.aborted) {
+                    clearTimeout(id);
+                    return reject(new Error('Stopped by user'));
                 }
-            } catch (error) {
-                return reject(error);
+                signal.addEventListener('abort', onAbort);
             }
+        });
+    };
+
+    for (let i = 0; i < gameHistory.length; i++) {
+        const record = gameHistory[i];
+
+        if (cutSignal && cutSignal.aborted) {
+            throw new Error('Stopped by user');
         }
 
-        topWins.sort((a, b) => b.prize - a.prize);
+        if (record.win <= 0) continue;
 
-        resolve(topWins.slice(0, 5));
-    });
+        await waitWithAbort(300, cutSignal);
+
+        topWins.push({
+            gameName: String(record.game).toUpperCase(),
+            betAmount: record.bet,
+            prize: record.win,
+            date: new Date().toLocaleDateString()
+        });
+    }
+
+    topWins.sort((a, b) => b.prize - a.prize);
+
+    return topWins.slice(0, 5);
 }
