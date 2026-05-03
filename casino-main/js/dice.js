@@ -7,7 +7,6 @@ const dodepButton = document.getElementById('dodepNaBalik');
 const dodepCase = document.getElementById('dodep');
 const userBetInput = document.getElementById('user-bet');
 
-// ensure global balance helpers are initialized
 if (window.loadBalance) window.loadBalance();
 if (window.updateBalanceDisplay) window.updateBalanceDisplay();
 

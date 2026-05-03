@@ -1,3 +1,5 @@
+import { addGameResult } from './db.js'; 
+
 const playButton = document.getElementById("gamble");
 const resultText = document.getElementById("gamle-result");
 const wheel1 = document.getElementById("wheel1");
@@ -11,8 +13,8 @@ let spinValve;
 let stopStep = 0;
 let spinInterval;
 
-loadBalance();
-updateBalanceDisplay();
+if (window.loadBalance) window.loadBalance();
+if (window.updateBalanceDisplay) window.updateBalanceDisplay();
 
 playButton.addEventListener("click", rungame);
 
@@ -28,14 +30,17 @@ function rungame() {
         return;
     }
 
-    if (userBalance < spinValve) {
+    const currentBalance = window.userBalance ?? 0;
+
+    if (currentBalance < spinValve) {
         resultText.textContent = "Not enough balance";
         return;
     }
 
     playButton.disabled = true;
-    saveBalance(userBalance - spinValve);
-    updateBalanceDisplay();
+    if (window.saveBalance) window.saveBalance(currentBalance - spinValve);
+    if (window.updateBalanceDisplay) window.updateBalanceDisplay();
+    
     resultText.textContent = "Good luck!";
 
     stopStep = 0;
@@ -45,7 +50,6 @@ function rungame() {
         stopStep = 1;
         let val1 = randomSymbol();
         wheel1.textContent = val1;
-
 
         setTimeout(() => {
             stopStep = 2;
@@ -58,10 +62,6 @@ function rungame() {
                 wheel3.textContent = val3;
 
                 clearInterval(spinInterval);
-
-                /*val1 = '<3';
-                val2 = '<3';
-                val3 = '<3';*/
 
                 checkWin(val1, val2, val3);
                 playButton.disabled = false;
@@ -85,6 +85,7 @@ function wheelAnimation() {
         wheel3.textContent = randomSymbol();
     }
 }
+
 function multiplier(r1, r2, r3) {
     if (r1 === r2 && r2 === r3) {
         return 7;
@@ -97,34 +98,41 @@ function multiplier(r1, r2, r3) {
 
 let preInitial;
 
-function checkWin(r1, r2, r3) {
-
+async function checkWin(r1, r2, r3) {
     if (!preInitial) {
-        preInitial = window.memo(multiplier, 10);
+        preInitial = window.memo ? window.memo(multiplier, 10) : multiplier;
     }
 
     const currentMultiplier = preInitial(r1, r2, r3);
+    let winAmount = 0; 
 
     if (currentMultiplier === 7) {
+        winAmount = spinValve * 7;
         resultText.textContent = "JACKPOT!!! x7";
-        saveBalance(userBalance + (spinValve * 7)); 
+        if (window.saveBalance) window.saveBalance((window.userBalance ?? 0) + winAmount); 
         
-        const colorsGen = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
-        window.timeoutConsumer(colorsGen, 3, (color) => {
-            if (color === "") {
-                resultText.style.color = "black";
-            } else {
-                resultText.style.color = color;
-            }
-        });
+        if (window.colorGenerator && window.timeoutConsumer) {
+            const colorsGen = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
+            window.timeoutConsumer(colorsGen, 3, (color) => {
+                if (color === "") {
+                    resultText.style.color = "black";
+                } else {
+                    resultText.style.color = color;
+                }
+            });
+        }
     }
     else if (currentMultiplier === 2) {
+        winAmount = spinValve * 2;
         resultText.textContent = "Matched pair! x2";
-        saveBalance(userBalance + (spinValve * 2));
+        if (window.saveBalance) window.saveBalance((window.userBalance ?? 0) + winAmount);
     } 
     else {
         resultText.textContent = "You lost. Try again!";
     }
     
-    updateBalanceDisplay();
+    if (window.updateBalanceDisplay) window.updateBalanceDisplay();
+
+
+    await addGameResult('Slots', { bet: spinValve, win: winAmount });
 }
