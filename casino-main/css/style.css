@@ -116,6 +116,16 @@ input[type="number"]:focus {
     color: #ffffff;
 }
 
+.wheel.spinning {
+    animation: reelSpin 360ms steps(1) infinite;
+}
+
+@keyframes reelSpin {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-12px) scale(0.92); opacity: 0.85; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
 #gamle-result {
     font-size: 1.5rem;
     font-weight: bold;
