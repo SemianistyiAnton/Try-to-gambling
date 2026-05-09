@@ -1,5 +1,3 @@
-import { addGameResult } from './db.js'; 
-
 const playButton = document.getElementById("gamble");
 const resultText = document.getElementById("gamle-result");
 const wheel1 = document.getElementById("wheel1");
@@ -9,15 +7,12 @@ const spinBetInput = document.getElementById("user-bet");
 
 const symbols = ['<3', '-_-', '{}', '7']; 
 
-let spinInterval;
-
 async function syncBalance() {
     try {
         const response = await fetch('http://127.0.0.1:8000/api/balance');
         if (response.ok) {
             const data = await response.json();
             if (window.saveBalance) window.saveBalance(data.balance);
-            if (window.updateBalanceDisplay) window.updateBalanceDisplay();
         }
     } catch (e) {
         console.error("Cannot connect to server for balance sync", e);
@@ -32,14 +27,6 @@ function randomSymbol() {
     return symbols[Math.floor(Math.random() * symbols.length)];
 }
 
-function startFakeAnimation() {
-    spinInterval = setInterval(() => {
-        wheel1.textContent = randomSymbol();
-        wheel2.textContent = randomSymbol();
-        wheel3.textContent = randomSymbol();
-    }, 100);
-}
-
 async function rungame() {
     const spinValve = parseInt(spinBetInput.value);
 
@@ -48,58 +35,83 @@ async function rungame() {
         return;
     }
 
+    if ((window.userBalance ?? 0) < spinValve) {
+        resultText.textContent = "Not enough balance";
+        return;
+    }
+
     playButton.disabled = true;
-    resultText.textContent = "Connecting to server...";
+    resultText.textContent = "Spinning...";
     resultText.style.color = "black";
 
+    if (window.saveBalance) window.saveBalance(window.userBalance - spinValve);
+
+    let stopStep = 0;
+    const spinInterval = setInterval(() => {
+        if (stopStep === 0) {
+            wheel1.textContent = randomSymbol();
+            wheel2.textContent = randomSymbol();
+            wheel3.textContent = randomSymbol();
+        } else if (stopStep === 1) {
+            wheel2.textContent = randomSymbol();
+            wheel3.textContent = randomSymbol();
+        } else if (stopStep === 2) {
+            wheel3.textContent = randomSymbol();
+        }
+    }, 100);
+    await new Promise(resolve => setTimeout(resolve, 1000));
     try {
         const response = await fetch('http://127.0.0.1:8000/api/slots/spin', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ bet: spinValve })
         });
 
         if (!response.ok) {
+            clearInterval(spinInterval);
             const errorData = await response.json();
             resultText.textContent = `Error: ${errorData.detail || 'Server error'}`;
+            syncBalance(); 
             playButton.disabled = false;
             return;
         }
 
         const data = await response.json();
 
-        resultText.textContent = "Spinning...";
-        startFakeAnimation();
-
-        setTimeout(async () => {
-            clearInterval(spinInterval);
-
+        setTimeout(() => {
+            stopStep = 1;
             wheel1.textContent = data.wheels[0];
-            wheel2.textContent = data.wheels[1];
-            wheel3.textContent = data.wheels[2];
 
-            if (window.saveBalance) window.saveBalance(data.new_balance);
-            if (window.updateBalanceDisplay) window.updateBalanceDisplay();
+            setTimeout(() => {
+                stopStep = 2;
+                wheel2.textContent = data.wheels[1];
 
-            if (data.multiplier === 7) {
-                resultText.textContent = "JACKPOT!!! x7";
-                triggerJackpotAnimation();
-            } else if (data.multiplier === 2) {
-                resultText.textContent = "Matched pair! x2";
-            } else {
-                resultText.textContent = "You lost. Try again!";
-            }
+                setTimeout(() => {
+                    stopStep = 3;
+                    wheel3.textContent = data.wheels[2];
+                    clearInterval(spinInterval);
 
-            await addGameResult('Slots', { bet: spinValve, win: data.win_amount });
-            
-            playButton.disabled = false;
-        }, 1500);
+                    if (window.saveBalance) window.saveBalance(data.new_balance);
+
+                    if (data.multiplier === 7) {
+                        resultText.textContent = "JACKPOT!!! x7";
+                        triggerJackpotAnimation();
+                    } else if (data.multiplier === 2) {
+                        resultText.textContent = "Matched pair! x2";
+                    } else {
+                        resultText.textContent = "You lost. Try again!";
+                    }
+                    
+                    playButton.disabled = false;
+                }, 500); 
+            }, 500); 
+        }, 500);
 
     } catch (error) {
+        clearInterval(spinInterval);
         resultText.textContent = "Network error. Is the server running?";
         console.error(error);
+        syncBalance(); 
         playButton.disabled = false;
     }
 }
@@ -108,11 +120,7 @@ function triggerJackpotAnimation() {
     if (window.colorGenerator && window.timeoutConsumer) {
         const colorsGen = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
         window.timeoutConsumer(colorsGen, 3, (color) => {
-            if (color === "") {
-                resultText.style.color = "black";
-            } else {
-                resultText.style.color = color;
-            }
+            resultText.style.color = color === "" ? "black" : color;
         });
     }
 }
