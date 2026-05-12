@@ -2,6 +2,7 @@
 <html lang="eu">
 
 <head>
+    <link rel="stylesheet" href="css/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Holla, little gambler</title>
@@ -34,14 +35,14 @@
     </script>
 
     <script type="module">
-        import { colorGenerator, timeoutConsumer } from 'casino-lib';
+        import { colorGenerator, timeoutConsumer, memo } from 'casino-lib';
 
+        window.memo = memo;
         window.colorGenerator = colorGenerator;
         window.timeoutConsumer = timeoutConsumer;
 
     </script>
-
-    <script src="js/slots.js"></script>
+<script type="module" src="js/slots.js"></script>
 </body>
 
 </html>

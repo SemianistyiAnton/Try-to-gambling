@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/style.css">
     <title>casino lobby</title>
 </head>
 <body>
@@ -13,10 +14,31 @@
     <a href="dice.html">Dice</a>
 
 <script src="js/main.js"></script>
-<script>
-    loadBalance();
-    updateBalanceDisplay();
-</script>
+    <script>
+        loadBalance();
+        updateBalanceDisplay();
+    </script>
 
+    <hr>
+    <div id="leaderboard-section">
+        <h2>🏆 glory</h2>
+        
+        <button id="btn-load-top">Show Top 5 Wins</button>
+        <button id="btn-cancel-top" disabled>Cancel Load</button>
+        
+        <p id="leaderboard-status"></p>
+        
+        <ol id="leaderboard-list"></ol>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "casino-lib": "../casino-lib/index.js"
+            }
+        }
+    </script>
+
+    <script type="module" src="js/lobby.js"></script>
 </body>
 </html>

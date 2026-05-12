@@ -1,2 +1,16 @@
+
 /.vscode
-/node-modules
+node_modules/
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+venv/
+.venv/
+env/
+
+*.sqlite3
+*.db
+
+.env
