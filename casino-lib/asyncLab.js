@@ -32,7 +32,7 @@ export async function Leaderboard(gameHistory, cutSignal = null) {
 
         if (record.win <= 0) continue;
 
-        await waitWithAbort(300, cutSignal);
+        //await waitWithAbort(300, cutSignal);
 
         topWins.push({
             gameName: String(record.game).toUpperCase(),

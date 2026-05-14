@@ -43,7 +43,7 @@ async function rungame() {
 
     playButton.disabled = true;
     resultText.textContent = "Spinning...";
-    resultText.style.color = "black";
+    resultText.style.color = "white";
 
     wheel1.classList.add('spinning');
     wheel2.classList.add('spinning');
@@ -109,7 +109,7 @@ function triggerJackpotAnimation() {
     if (window.colorGenerator && window.timeoutConsumer) {
         const colorsGen = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);
         window.timeoutConsumer(colorsGen, 3, (color) => {
-            resultText.style.color = color === "" ? "black" : color;
+            resultText.style.color = color === "" ? "white" : color;
         });
     }
 }

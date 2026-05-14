@@ -11,7 +11,7 @@ const list = document.getElementById('leaderboard-list');
 btnLoad.addEventListener('click', async () => {
     list.innerHTML = "";
     statusText.textContent = "server connect. Search invalid result";
-    statusText.style.color = "black";
+    statusText.style.color = "white";
     btnLoad.disabled = true;
     btnCancel.disabled = false; 
     
