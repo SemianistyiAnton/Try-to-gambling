@@ -32,15 +32,6 @@
 
     <hr><a href="index.html">Home page</a>
 
-    <script src="js/main.js"></script>
-    <script type="importmap">
-        {
-            "imports": {
-                "casino-lib": "../casino-lib/index.js"
-            }
-        }
-    </script>
-
     <script type="module">
         import { colorGenerator, timeoutConsumer, memo } from 'casino-lib';
 
@@ -49,10 +40,8 @@
         window.timeoutConsumer = timeoutConsumer;
 
     </script>
-<script type="module" src="js/slots.js"></script>
-<script src="js/main.js"></script>
-
-<script type="module" src="js/main.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/slots.js"></script>
 </body>
 
 </html>
