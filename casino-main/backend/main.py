@@ -77,7 +77,8 @@ class DiceRequest(BaseModel):
 
 @app.get("/api/balance")
 async def api_get_balance():
-    return {"balance": get_balance()}
+    bal = get_balance()
+    return {"balance": bal, "new_balance": bal}
 
 @app.post("/api/slots/spin")
 async def spin_slots(request: SpinRequest):
@@ -121,11 +122,12 @@ async def roll_dice(request: DiceRequest):
     
     return {"roll": roll, "win_amount": win_amount, "new_balance": get_balance()}
 
+
 @app.get("/api/history")
-async def get_history():
+async def get_history(limit: int = 10, offset: int = 0):
     conn = sqlite3.connect('casino.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT game, bet, win, date FROM history ORDER BY id DESC LIMIT 100')
+    cursor.execute('SELECT game, bet, win, date FROM history ORDER BY id DESC LIMIT ? OFFSET ?', (limit, offset))
     rows = cursor.fetchall()
     conn.close()
     

@@ -21,7 +21,11 @@ async function syncBalance() {
 
 syncBalance();
 
-playButton.addEventListener("click", rungame);
+if (playButton) {
+    playButton.addEventListener("click", rungame);
+} else {
+    console.warn('Slots: play button not found (id="gamble").');
+}
 
 function randomSymbol() {
     return symbols[Math.floor(Math.random() * symbols.length)];
@@ -45,11 +49,11 @@ async function rungame() {
     resultText.textContent = "Spinning...";
     resultText.style.color = "white";
 
-    wheel1.classList.add('spinning');
-    wheel2.classList.add('spinning');
-    wheel3.classList.add('spinning');
+    if (wheel1) wheel1.classList.add('spinning');
+    if (wheel2) wheel2.classList.add('spinning');
+    if (wheel3) wheel3.classList.add('spinning');
 
-    if (window.saveBalance) window.saveBalance(currentBalance - spinValve);
+    const startTime = Date.now();
 
     let spinning = [true, true, true];
     let tickCount = 0;
@@ -75,34 +79,42 @@ async function rungame() {
         if (!response.ok) {
             console.warn(`[${Date.now() - startTime}ms] status ${response.status}`);
             clearInterval(spinInterval);
-            playButton.disabled = false;
+            if (playButton) playButton.disabled = false;
             return;
         }
 
         const data = await response.json();
         const delay = (ms) => new Promise(res => setTimeout(res, ms));
         
-        spinning[0] = false; wheel1.textContent = data.wheels[0];
+        spinning[0] = false; if (wheel1) wheel1.textContent = data.wheels[0];
         await delay(500); 
-
-        spinning[1] = false; wheel2.textContent = data.wheels[1];
+        
+        spinning[1] = false; if (wheel2) wheel2.textContent = data.wheels[1];
         await delay(500);
 
-        spinning[2] = false; wheel3.textContent = data.wheels[2];
+        spinning[2] = false; if (wheel3) wheel3.textContent = data.wheels[2];
         
         clearInterval(spinInterval);
 
         await delay(2000);
 
-        if (window.saveBalance) window.saveBalance(data.new_balance);
-        resultText.textContent = data.multiplier > 0 ? `Win: x${data.multiplier}` : "You lost.";
+        if (window.saveBalance && typeof data.new_balance !== 'undefined') {
+            window.saveBalance(data.new_balance);
+        } else if (typeof data.new_balance !== 'undefined') {
+            window.userBalance = data.new_balance;
+        }
+
+        if (resultText) {
+            resultText.textContent = data.multiplier > 0 ? `Win: x${data.multiplier}` : "You lost.";
+            resultText.style.color = data.multiplier > 0 ? 'lime' : 'white';
+        }
 
     } catch (error) {
         clearInterval(spinInterval);
-        resultText.textContent = "Network error / Exception";
-        if (window.saveBalance) window.saveBalance((window.userBalance ?? 0) + spinValve); 
+        if (resultText) resultText.textContent = "Network error / Exception";
+        if (window.saveBalance) window.saveBalance((window.userBalance ?? 0) + spinValve);
     } finally {
-        playButton.disabled = false;
+        if (playButton) playButton.disabled = false;
     }
 }
 function triggerJackpotAnimation() {

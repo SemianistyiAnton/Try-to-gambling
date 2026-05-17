@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/style.css">
     <title>casino lobby</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "casino-lib": "../casino-lib/index.js"
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Welcome my friend!</h1>
@@ -19,11 +26,15 @@
         updateBalanceDisplay();
     </script>
 
+    <script type="module">
+        if (window.loadBalance) window.loadBalance();
+    </script>
+
     <hr>
     <div id="leaderboard-section">
         <h2>🏆 glory</h2>
         
-        <button id="btn-load-top">Show Top 5 Wins</button>
+        <button id="btn-load-top">Show Top Wins</button>
         <button id="btn-cancel-top" disabled>Cancel Load</button>
         
         <p id="leaderboard-status"></p>
@@ -31,14 +42,9 @@
         <ol id="leaderboard-list"></ol>
     </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "casino-lib": "../casino-lib/index.js"
-            }
-        }
-    </script>
-
     <script type="module" src="js/lobby.js"></script>
+    <script src="js/main.js"></script>
+
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

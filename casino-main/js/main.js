@@ -1,31 +1,45 @@
+import { EventEmitter } from 'casino-lib';
 
-async function loadBalance() {
+window.casinoEvents = new EventEmitter();
+
+let _userBalance = 100;
+
+window.saveBalance = function(newAmount) {
+    _userBalance = newAmount;
+    window.casinoEvents.emit('balanceChanged', _userBalance);
+};
+
+Object.defineProperty(window, 'userBalance', {
+    get: () => _userBalance,
+    set: (val) => window.saveBalance(val)
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const balanceElement = document.getElementById("balance");
+    const betInput = document.getElementById("user-bet");
+
+    if (balanceElement) {
+        window.casinoEvents.on('balanceChanged', (newBalance) => {
+            balanceElement.textContent = `Balance: ${newBalance}`;
+        });
+    }
+
+    if (betInput) {
+        window.casinoEvents.on('balanceChanged', (newBalance) => {
+            betInput.max = newBalance;
+            betInput.placeholder = `Max: ${newBalance}`;
+        });
+    }
+});
+window.loadBalance = async function() {
     try {
         const response = await fetch('http://127.0.0.1:8000/api/balance');
         if (response.ok) {
             const data = await response.json();
             window.userBalance = data.balance;
-            updateBalanceDisplay();
         }
     } catch (e) {
         console.error("Failed to connect to server", e);
         window.userBalance = 0;
     }
-}
-function saveBalance(newAmount) {
-    window.userBalance = newAmount;
-    updateBalanceDisplay();
-}
-
-function updateBalanceDisplay() {
-    const balanceElement = document.getElementById("balance");
-    if (balanceElement) {
-        balanceElement.textContent = `Balance: ${window.userBalance}`;
-    }
-
-    const betInput = document.getElementById("user-bet");
-    if (betInput) {
-        betInput.max = window.userBalance;
-        betInput.placeholder = `Max: ${window.userBalance}`;
-    }
-}
+};

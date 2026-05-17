@@ -10,7 +10,7 @@ async function syncBalance() {
         const response = await fetch('http://127.0.0.1:8000/api/balance');
         if (response.ok) {
             const data = await response.json();
-            if (window.saveBalance) window.saveBalance(data.balance);
+            window.userBalance = typeof data.balance !== 'undefined' ? data.balance : data.new_balance;
         }
     } catch (e) {
         console.error("Cannot connect to server", e);
@@ -18,8 +18,8 @@ async function syncBalance() {
 }
 syncBalance();
 
-playDiceButton.addEventListener('click', diceRoll);
-dodepButton.addEventListener('click', dodepNaBalance);
+if (playDiceButton) playDiceButton.addEventListener('click', diceRoll);
+if (dodepButton) dodepButton.addEventListener('click', dodepNaBalance);
 
 async function diceRoll() {
     const diceBet = parseInt(userBetInput.value, 10);
@@ -42,13 +42,11 @@ async function diceRoll() {
         return;
     }
 
-    playDiceButton.disabled = true;
-    diceText.textContent = 'Rolling...';
-
-    if (window.saveBalance) window.saveBalance(window.userBalance - diceBet);
+    if (playDiceButton) playDiceButton.disabled = true;
+    if (diceText) diceText.textContent = 'Rolling...';
 
     const rollInterval = setInterval(() => {
-        diceResultText.textContent = Math.floor(Math.random() * 6) + 1;
+        if (diceResultText) diceResultText.textContent = Math.floor(Math.random() * 6) + 1;
     }, 100);
 
     try {
@@ -76,26 +74,25 @@ async function diceRoll() {
 
         setTimeout(() => {
             clearInterval(rollInterval);
-            diceResultText.textContent = `${data.roll}`;
+            if (diceResultText) diceResultText.textContent = `${data.roll}`;
 
-            if (window.saveBalance) window.saveBalance(data.new_balance);
-
-            if (data.win_amount > 0) {
-                diceText.textContent = `Rolled ${data.roll}. You win ${data.win_amount}!`;
-            } else {
-                diceText.textContent = `Rolled ${data.roll}. Try again?`;
+            if (typeof data.new_balance !== 'undefined') {
+                window.userBalance = data.new_balance;
             }
-            
-            playDiceButton.disabled = false;
+
+            if (diceText) {
+                diceText.textContent = data.win_amount > 0 ? `Rolled ${data.roll}. You win ${data.win_amount}!` : `Rolled ${data.roll}. Try again?`;
+            }
+            if (playDiceButton) playDiceButton.disabled = false;
         }, 1000);
 
     } catch (error) {
         clearInterval(rollInterval);
-        diceResultText.textContent = '...';
-        diceText.textContent = "Server connection error.";
+        if (diceResultText) diceResultText.textContent = '...';
+        if (diceText) diceText.textContent = "Server connection error.";
         console.error(error);
         syncBalance();
-        playDiceButton.disabled = false;
+        if (playDiceButton) playDiceButton.disabled = false;
     }
 }
 
@@ -104,9 +101,9 @@ async function dodepNaBalance() {
         const response = await fetch('http://127.0.0.1:8000/api/deposit', { method: 'POST' });
         if (response.ok) {
             const data = await response.json();
-            if (window.saveBalance) window.saveBalance(data.new_balance);
-            dodepCase.style.display = 'none';
-            diceText.textContent = 'Balance topped up! Place your bets.';
+            if (typeof data.new_balance !== 'undefined') window.userBalance = data.new_balance;
+            if (dodepCase) dodepCase.style.display = 'none';
+            if (diceText) diceText.textContent = 'Balance topped up! Place your bets.';
         }
     } catch (error) {
         console.error("Deposit error:", error);
