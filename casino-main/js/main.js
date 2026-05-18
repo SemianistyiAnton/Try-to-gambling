@@ -1,7 +1,11 @@
-import { EventEmitter } from 'casino-lib';
+
+import { EventEmitter, AuthProxy } from 'casino-lib';
 
 window.casinoEvents = new EventEmitter();
+window.apiProxy = new AuthProxy('http://127.0.0.1:8000');
+window.apiProxy.setToken('my-secret-api-token');
 
+window.casinoEvents = new EventEmitter();
 let _userBalance = 100;
 
 window.saveBalance = function(newAmount) {
@@ -31,7 +35,7 @@ if (betInput) {
 }
 window.loadBalance = async function() {
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/balance');
+        const response = await window.apiProxy.get('/api/balance');
         if (response.ok) {
             const data = await response.json();
             window.userBalance = data.balance !== undefined ? data.balance : data.new_balance;

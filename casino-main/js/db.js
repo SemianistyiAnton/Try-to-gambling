@@ -3,7 +3,7 @@ export async function* getHistoryStream(batchSize = 5) {
     
     while (true) {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/history?limit=${batchSize}&offset=${offset}`);
+            const response = await window.apiProxy.get(`/api/history?limit=${batchSize}&offset=${offset}`);
             
             if (!response.ok) throw new Error(`Server error: ${response.status}`);
             

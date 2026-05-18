@@ -4,6 +4,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends
 
 app = FastAPI(title="Casino API")
 
@@ -137,3 +139,40 @@ async def get_history(limit: int = 10, offset: int = 0):
 async def deposit():
     update_balance(100)
     return {"new_balance": get_balance()}
+
+
+security = HTTPBearer()
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if credentials.credentials != "my-secret-api-token":
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
+    return credentials.credentials
+
+@app.get("/api/balance", dependencies=[Depends(verify_token)])
+async def api_get_balance():
+    bal = get_balance()
+    return {"balance": bal, "new_balance": bal}
+
+@app.post("/api/slots/spin", dependencies=[Depends(verify_token)])
+async def spin_slots(request: SpinRequest):
+    bet = request.bet
+    if bet <= 0: raise HTTPException(status_code=400, detail="Invalid bet")
+    if get_balance() < bet: raise HTTPException(status_code=400, detail="Not enough balance")
+        
+    update_balance(-bet) 
+    
+    w1, w2, w3 = secrets.choice(SYMBOLS), secrets.choice(SYMBOLS), secrets.choice(SYMBOLS)
+    multiplier = 7 if w1 == w2 == w3 else (2 if w1 == w2 or w2 == w3 or w1 == w3 else 0)
+    win_amount = bet * multiplier
+    
+    if win_amount > 0: 
+        update_balance(win_amount)
+        
+    save_game("Slots", bet, win_amount)
+    
+    return {
+        "wheels": [w1, w2, w3],
+        "win_amount": win_amount,
+        "multiplier": multiplier,
+        "new_balance": get_balance()
+    }

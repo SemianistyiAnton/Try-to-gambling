@@ -68,13 +68,9 @@ async function rungame() {
     try {
         
         const [response] = await Promise.all([
-            fetch('http://127.0.0.1:8000/api/slots/spin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bet: spinValve })
-            }),
-            new Promise(resolve => setTimeout(resolve, 2500))
-        ]);
+        window.apiProxy.post('/api/slots/spin', { bet: spinValve }),
+        new Promise(resolve => setTimeout(resolve, 2500))
+]);
 
         if (!response.ok) {
             console.warn(`[${Date.now() - startTime}ms] status ${response.status}`);

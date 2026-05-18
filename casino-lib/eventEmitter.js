@@ -7,7 +7,6 @@ export class EventEmitter {
             this.listeners[event] = [];
         }
         this.listeners[event].push(callback);
-
         return () => this.off(event, callback);
     }
 
