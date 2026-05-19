@@ -1,3 +1,5 @@
+import { withLog } from 'casino-lib';
+
 const playButton = document.getElementById("gamble");
 const resultText = document.getElementById("gamle-result");
 const wheel1 = document.getElementById("wheel1");
@@ -7,13 +9,18 @@ const spinBetInput = document.getElementById("user-bet");
 
 const symbols = ['<3', '-_-', '{}', '7']; 
 
+const executeBalanceSync = withLog({ level: 'ERROR' })(async () => {
+    const response = await window.apiProxy.get('/api/balance');
+    if (!response.ok) {
+        throw new Error(`Server returned status: ${response.status}`);
+    }
+    return await response.json();
+});
+
 async function syncBalance() {
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/balance');
-        if (response.ok) {
-            const data = await response.json();
-            if (window.saveBalance) window.saveBalance(data.balance);
-        }
+        const data = await executeBalanceSync();
+        if (window.saveBalance && data) window.saveBalance(data.balance);
     } catch (e) {
         console.error("Cannot connect to server for balance sync", e);
     }
@@ -30,6 +37,10 @@ if (playButton) {
 function randomSymbol() {
     return symbols[Math.floor(Math.random() * symbols.length)];
 }
+
+const executeSpinRequest = withLog({ level: 'INFO', formatJson: false })(async (spinValve) => {
+    return await window.apiProxy.post('/api/slots/spin', { bet: spinValve });
+});
 
 async function rungame() {
     const spinValve = parseInt(spinBetInput.value);
@@ -66,11 +77,10 @@ async function rungame() {
     }, 50);
 
     try {
-        
         const [response] = await Promise.all([
-        window.apiProxy.post('/api/slots/spin', { bet: spinValve }),
-        new Promise(resolve => setTimeout(resolve, 2500))
-]);
+            executeSpinRequest(spinValve),
+            new Promise(resolve => setTimeout(resolve, 2500))
+        ]);
 
         if (!response.ok) {
             console.warn(`[${Date.now() - startTime}ms] status ${response.status}`);
@@ -113,6 +123,7 @@ async function rungame() {
         if (playButton) playButton.disabled = false;
     }
 }
+
 function triggerJackpotAnimation() {
     if (window.colorGenerator && window.timeoutConsumer) {
         const colorsGen = window.colorGenerator(['gold', 'red', 'magenta', 'lime', 'cyan']);

@@ -1,5 +1,5 @@
+import { EventEmitter, AuthProxy, withLog } from 'casino-lib';
 
-import { EventEmitter, AuthProxy } from 'casino-lib';
 
 window.casinoEvents = new EventEmitter();
 window.apiProxy = new AuthProxy('http://127.0.0.1:8000');
@@ -8,7 +8,7 @@ window.apiProxy.setToken('my-secret-api-token');
 window.casinoEvents = new EventEmitter();
 let _userBalance = 100;
 
-window.saveBalance = function(newAmount) {
+window.saveBalance = function (newAmount) {
     _userBalance = newAmount;
     window.casinoEvents.emit('balanceChanged', _userBalance);
 };
@@ -16,6 +16,15 @@ window.saveBalance = function(newAmount) {
 Object.defineProperty(window, 'userBalance', {
     get: () => _userBalance,
     set: (val) => window.saveBalance(val)
+});
+
+const updateBalanceTask = withLog({ level: 'ERROR' })(async () => {
+    const response = await window.apiProxy.get('/api/balance');
+    if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+    }
+    const data = await response.json();
+    window.casinoEvents.emit('balanceUpdated', data.balance);
 });
 
 const balanceElement = document.getElementById("balance");
@@ -33,7 +42,7 @@ if (betInput) {
         betInput.placeholder = `Max: ${newBalance}`;
     });
 }
-window.loadBalance = async function() {
+window.loadBalance = async function () {
     try {
         const response = await window.apiProxy.get('/api/balance');
         if (response.ok) {
@@ -42,8 +51,9 @@ window.loadBalance = async function() {
         }
     } catch (e) {
         console.error("Failed to connect to server", e);
-        window.userBalance = 0; 
+        window.userBalance = 0;
     }
 };
 
 window.loadBalance();
+updateBalanceTask();

@@ -138,6 +138,7 @@ async def get_history(limit: int = 10, offset: int = 0):
     return [{"game": r[0], "result": {"bet": r[1], "win": r[2]}, "date": r[3]} for r in rows]
 
 @app.post("/api/deposit")
+@log(level="ERROR")
 async def deposit():
     update_balance(100)
     return {"new_balance": get_balance()}
