@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends
+from logger import log
 
 app = FastAPI(title="Casino API")
 
@@ -107,6 +108,7 @@ async def spin_slots(request: SpinRequest):
     }
 
 @app.post("/api/dice/roll")
+@log(level="INFO", format_json=False)
 async def roll_dice(request: DiceRequest):
     bet, guess = request.bet, request.guess
     if bet <= 0 or not (1 <= guess <= 6): raise HTTPException(status_code=400, detail="Invalid data")
@@ -149,11 +151,13 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     return credentials.credentials
 
 @app.get("/api/balance", dependencies=[Depends(verify_token)])
+@log(level="INFO", format_json=True)
 async def api_get_balance():
     bal = get_balance()
     return {"balance": bal, "new_balance": bal}
 
 @app.post("/api/slots/spin", dependencies=[Depends(verify_token)])
+@log(level="INFO", format_json=False)
 async def spin_slots(request: SpinRequest):
     bet = request.bet
     if bet <= 0: raise HTTPException(status_code=400, detail="Invalid bet")
